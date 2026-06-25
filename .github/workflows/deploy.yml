@@ -32,7 +32,10 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftp
-          server-dir: public_html/
+          # ./ = la cuenta FTP debe apuntar DIRECTO a la carpeta del subdominio de prueba
+          # (asi el deploy NUNCA toca el public_html de la tienda viva). Si tu cuenta FTP es general,
+          # cambia ./ por la ruta del subdominio (ej. public_html/nuevo.velaslumin.com/).
+          server-dir: ./
           exclude: |
             **/.git*
             **/.git*/**
