@@ -1,0 +1,40 @@
+name: Deploy a Hostinger
+
+# Despliega el sitio estatico a Hostinger por FTP en cada push a main.
+# Requiere 3 secrets (Settings -> Secrets and variables -> Actions):
+#   FTP_SERVER / FTP_USERNAME / FTP_PASSWORD  (de hPanel -> Archivos -> Cuentas FTP)
+# Ajusta server-dir al public_html de velaslumin.com (puede ser addon: domains/velaslumin.com/public_html/)
+#
+# *** OJO: velaslumin.com hoy tiene una TIENDA WooCommerce VIVA Y VENDIENDO. ***
+# No apuntes este deploy al public_html de la tienda viva hasta migrar comercio (Stripe/WhatsApp) + 301 de SEO.
+# Sugerido: desplegar primero a un subdominio/carpeta de PRUEBA y hacer el cutover con cuidado.
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      FTP_SERVER: ${{ secrets.FTP_SERVER }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Subir por FTP a Hostinger
+        # se salta (workflow en verde) mientras no existan los secrets FTP
+        if: ${{ env.FTP_SERVER != '' }}
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftp
+          server-dir: public_html/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/.github/**
+            README.md
